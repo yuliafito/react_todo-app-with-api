@@ -6,7 +6,7 @@ type Props = {
   handleToggleAllTodos: (shouldBeCompleted: boolean) => void;
   inputRef: React.RefObject<HTMLInputElement>;
   handleAddTodo: (title: string) => void;
-  isAdding: boolean;
+  isAddingTodo: boolean;
   title: string;
   setTitle: (value: string) => void;
 };
@@ -16,7 +16,7 @@ export const Header: React.FC<Props> = ({
   handleToggleAllTodos,
   inputRef,
   handleAddTodo,
-  isAdding,
+  isAddingTodo,
   title,
   setTitle,
 }) => {
@@ -57,7 +57,7 @@ export const Header: React.FC<Props> = ({
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
           onChange={e => setTitle(e.target.value)}
-          disabled={isAdding}
+          disabled={isAddingTodo}
         />
       </form>
     </header>

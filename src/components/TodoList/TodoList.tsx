@@ -4,11 +4,9 @@ import { TodoItem } from '../TodoItem/TodoItem';
 type Props = {
   todos: Todo[];
   onDelete: (todoId: number) => void;
-  loadingTodosIDs: number[];
+  processingTodoIds: number[];
   tempTodo: Todo | null;
-  editingId: number | null;
-  setEditingId: (id: number | null) => void;
-  handleEditTodo: (todo: Todo) => void;
+  handleEditTodo: (todo: Todo) => Promise<boolean>;
   onToggleStatus: (todo: Todo) => void;
   inputRef: React.RefObject<HTMLInputElement>;
 };
@@ -16,10 +14,8 @@ type Props = {
 export const TodoList: React.FC<Props> = ({
   todos,
   onDelete,
-  loadingTodosIDs,
+  processingTodoIds,
   tempTodo,
-  editingId,
-  setEditingId,
   handleEditTodo,
   inputRef,
   onToggleStatus = () => {},
@@ -31,9 +27,7 @@ export const TodoList: React.FC<Props> = ({
           key={todo.id}
           todo={todo}
           onDelete={onDelete}
-          isLoading={loadingTodosIDs.includes(todo.id)}
-          editingId={editingId}
-          setEditingId={setEditingId}
+          isLoading={processingTodoIds.includes(todo.id)}
           handleEditTodo={handleEditTodo}
           inputRef={inputRef}
           onToggleStatus={onToggleStatus}

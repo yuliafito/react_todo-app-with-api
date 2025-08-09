@@ -7,9 +7,7 @@ type Props = {
   todo: Todo;
   onDelete?: (todoId: number) => void;
   isLoading?: boolean;
-  editingId?: number | null;
-  setEditingId?: (id: number | null) => void;
-  handleEditTodo?: (todo: Todo) => void;
+  handleEditTodo?: (todo: Todo) => Promise<boolean>;
   onToggleStatus?: (todo: Todo) => void;
   inputRef: React.RefObject<HTMLInputElement>;
 };
@@ -18,35 +16,41 @@ export const TodoItem: React.FC<Props> = ({
   todo,
   onDelete = () => {},
   isLoading = false,
-  editingId,
-  setEditingId = () => {},
   handleEditTodo = () => {},
   onToggleStatus = () => {},
   inputRef,
 }) => {
   const [editedTitle, setEditedTitle] = useState(todo.title);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (editingId === todo.id) {
+    if (isEditing) {
       inputRef.current?.focus();
     }
-  }, [editingId, inputRef, todo.id]);
+  }, [isEditing, inputRef]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const submitEditedTitle = async () => {
+    const success = await handleEditTodo({ ...todo, title: editedTitle });
+
+    if (success) {
+      setIsEditing(false);
+    }
+  };
+
+  const handleKeyDown = async (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      handleEditTodo({ ...todo, title: editedTitle });
+
+      await submitEditedTitle();
     }
 
     if (event.key === 'Escape') {
       event.preventDefault();
       setEditedTitle(todo.title);
-      setEditingId(null);
+      setIsEditing(false);
     }
-  };
-
-  const submitEditedTitle = () => {
-    handleEditTodo({ ...todo, title: editedTitle });
   };
 
   return (
@@ -68,7 +72,7 @@ export const TodoItem: React.FC<Props> = ({
           />
         </label>
 
-        {editingId === todo.id ? (
+        {isEditing ? (
           <form onSubmit={submitEditedTitle}>
             <input
               ref={inputRef}
@@ -87,7 +91,7 @@ export const TodoItem: React.FC<Props> = ({
             <span
               data-cy="TodoTitle"
               className="todo__title"
-              onDoubleClick={() => setEditingId(todo.id)}
+              onDoubleClick={() => setIsEditing(true)}
             >
               {todo.title}
             </span>
